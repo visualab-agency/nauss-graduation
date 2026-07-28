@@ -505,7 +505,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
 }
 .stage.is-3d .pin-stalk{
   opacity:.85;
-  height:var(--pin-lift,70px);
+  height:calc(var(--pin-lift,70px) * var(--standee-scale,1));
 }
 
 /* Small caption that rides just under the standee card in 3D mode */
@@ -527,18 +527,19 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
   display:block;
   transform-origin:center bottom;
   transform:
-    translate(calc(-50% + var(--label-offset-x,0px)), -50%)
-    translateY(calc(-1 * var(--pin-label-lift,136px)))
+    translate(calc(-50% + (var(--label-offset-x,0px) * var(--standee-scale,1))), -50%)
+    translateY(calc(-1 * var(--pin-label-lift,136px) * var(--standee-scale,1)))
     rotateZ(calc(-1 * var(--pin-tilt-z,12deg)))
     rotateX(calc(-1 * var(--pin-tilt-x,55deg)))
     skewX(var(--pin-skew,0deg))
-    scale3d(var(--pin-scale-x,1), var(--pin-scale-y,1), var(--pin-scale-z,1));
+    scale3d(calc(var(--pin-scale-x,1) * var(--standee-scale,1)), calc(var(--pin-scale-y,1) * var(--standee-scale,1)), var(--pin-scale-z,1));
 }
 
 /* The circular thumbnail becomes an elevated, upright rectangular standee in 3D mode.
    Pin tilt can be tuned separately from the map-plane's own tilt. */
 .stage.is-3d .pin.pin-photo .thumb-dot{
-  width:90px; height:60px;
+  width:calc(90px * var(--standee-scale,1));
+  height:calc(60px * var(--standee-scale,1));
   border-radius:6px;
   border-color:rgba(255,244,210,0.96);
   box-shadow:
@@ -550,7 +551,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
     0 0 0 2px rgba(11,14,18,0.78);
   transform:
     translate(-50%,-50%)
-    translateY(calc(-1 * var(--pin-lift,70px)))
+    translateY(calc(-1 * var(--pin-lift,70px) * var(--standee-scale,1)))
     rotateZ(calc(-1 * var(--pin-tilt-z,12deg)))
     rotateX(calc(-1 * var(--pin-tilt-x,55deg)))
     skewX(var(--pin-skew,0deg))

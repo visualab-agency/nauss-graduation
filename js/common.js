@@ -296,6 +296,25 @@ function getRenderedImageBox(img){
   return {left, top, width, height};
 }
 
+// The 3D "standee" cards (90x60px) and their elevation/label-lift were
+// tuned by eye against a desktop-sized render of the map. On a small
+// screen the map image itself renders much smaller, so those same
+// fixed-pixel cards + offsets end up proportionally huge next to each
+// other and overlap. This returns a scale factor — based on how wide the
+// map is currently rendering vs. the width it was tuned against — so
+// callers can shrink the standees/elevation to match. Tune
+// STANDEE_REFERENCE_WIDTH if the "designed at" desktop width changes.
+const STANDEE_REFERENCE_WIDTH = 1400;
+const STANDEE_MIN_SCALE = 0.32;
+const STANDEE_MAX_SCALE = 1.15;
+
+function getMapStandeeScale(img){
+  const box = getRenderedImageBox(img);
+  if(!box.width) return 1;
+  const raw = box.width / STANDEE_REFERENCE_WIDTH;
+  return Math.min(STANDEE_MAX_SCALE, Math.max(STANDEE_MIN_SCALE, raw));
+}
+
 // Converts a pin's stored x/y (% of the photo) into px coordinates
 // relative to img's offsetParent (i.e. the .stage element), so it can be
 // used directly as CSS left/top on an absolutely-positioned pin inside stage.

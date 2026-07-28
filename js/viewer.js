@@ -177,6 +177,9 @@
 
   function renderPins(){
     mapPlane.querySelectorAll('.pin').forEach(p=>p.remove());
+    // Recompute how big the 3D standees should be relative to how large
+    // the map is currently rendering (changes on rotation/resize/mobile).
+    stage.style.setProperty('--standee-scale', getMapStandeeScale(mapImg));
     pins.forEach((pin, i)=>{
       const el = document.createElement('button');
       el.className = 'pin pin-photo';
