@@ -1,8 +1,8 @@
 [
   {
     "id": "pp20ffni",
-    "x": 61.21,
-    "y": 54.48,
+    "x": 61.35,
+    "y": 56.62,
     "title": "Reception Tent",
     "category": "Parent and Student Reception",
     "orientation": 1,
@@ -98,8 +98,8 @@
   },
   {
     "id": "pa9x95pt",
-    "x": 53.24,
-    "y": 44.54,
+    "x": 48.65,
+    "y": 44.94,
     "title": "Student Journey",
     "category": "Student Path",
     "orientation": 1,
@@ -219,8 +219,8 @@
   },
   {
     "id": "pulxtoq2",
-    "x": 61.53,
-    "y": 39.77,
+    "x": 61.21,
+    "y": 37.69,
     "title": "Entrance to Tent Area",
     "category": "Parents Entrance",
     "orientation": 2,

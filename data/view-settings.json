@@ -4,23 +4,23 @@
   "perspective": 6000,
   "categories": {
     "1": {
-      "pinTiltX": 19,
+      "pinTiltX": -19,
       "pinTiltZ": 90,
-      "pinScaleX": 1.45,
-      "pinScaleY": 0.9,
-      "pinScaleZ": 1.1,
-      "pinSkew": -57,
+      "pinScaleX": 1.6,
+      "pinScaleY": 1.55,
+      "pinScaleZ": 0.25,
+      "pinSkew": -51,
       "elevate": 14,
-      "labelLift": -108,
-      "labelOffsetX": 14
+      "labelLift": -1,
+      "labelOffsetX": -81
     },
     "2": {
       "pinTiltX": 29,
       "pinTiltZ": 1,
-      "pinScaleX": 1.6,
+      "pinScaleX": 1.5,
       "pinScaleY": 1.55,
       "pinScaleZ": 0.25,
-      "pinSkew": 35,
+      "pinSkew": 34,
       "elevate": 54,
       "labelLift": -41,
       "labelOffsetX": -79

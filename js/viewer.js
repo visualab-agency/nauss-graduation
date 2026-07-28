@@ -175,17 +175,12 @@
     return { reset };
   })();
 
-  function renderPins(){
+  function buildPins(){
     mapPlane.querySelectorAll('.pin').forEach(p=>p.remove());
-    // Recompute how big the 3D standees should be relative to how large
-    // the map is currently rendering (changes on rotation/resize/mobile).
-    stage.style.setProperty('--standee-scale', getMapStandeeScale(mapImg));
     pins.forEach((pin, i)=>{
       const el = document.createElement('button');
       el.className = 'pin pin-photo';
-      const pos = pinToStagePx(pin, mapImg);
-      el.style.left = pos.left + 'px';
-      el.style.top = pos.top + 'px';
+      el.dataset.pinIndex = i;
       el.setAttribute('aria-label', pin.title || `Location ${i+1}`);
       const mains = getMainImages(pin);
       const thumbFile = mains[0] ? mains[0].file : '';
@@ -202,9 +197,38 @@
       el.addEventListener('click', ()=> openPin(pin));
       mapPlane.appendChild(el);
     });
+    repositionPins();
   }
 
-  window.addEventListener('resize', renderPins);
+  // Cheap update: just moves existing pins and refreshes the responsive
+  // standee scale, without touching the DOM nodes themselves (no image
+  // reloads, no restarted CSS transitions/animations). Safe to call on
+  // every resize/orientation change.
+  function repositionPins(){
+    stage.style.setProperty('--standee-scale', getMapStandeeScale(mapImg));
+    mapPlane.querySelectorAll('.pin').forEach(el=>{
+      const pin = pins[Number(el.dataset.pinIndex)];
+      if(!pin) return;
+      const pos = pinToStagePx(pin, mapImg);
+      el.style.left = pos.left + 'px';
+      el.style.top = pos.top + 'px';
+    });
+  }
+
+  // Mobile browsers fire 'resize' for things that have nothing to do with
+  // the map's actual size — most commonly the address bar collapsing on
+  // scroll/tap, which changes innerHeight but not innerWidth. Rebuilding
+  // or even repositioning on every one of those causes visible flicker,
+  // so only react when the width actually changed (debounced a touch so
+  // rapid-fire events collapse into one update).
+  let lastResizeWidth = window.innerWidth;
+  let resizeRAF = null;
+  window.addEventListener('resize', ()=>{
+    if(window.innerWidth === lastResizeWidth) return;
+    lastResizeWidth = window.innerWidth;
+    if(resizeRAF) cancelAnimationFrame(resizeRAF);
+    resizeRAF = requestAnimationFrame(repositionPins);
+  });
 
   function escapeHtml(str){
     const d = document.createElement('div');
@@ -342,6 +366,6 @@
     }
   });
 
-  if(mapImg.complete){ renderPins(); }
-  else { mapImg.addEventListener('load', renderPins); }
+  if(mapImg.complete){ buildPins(); }
+  else { mapImg.addEventListener('load', buildPins); }
 })();

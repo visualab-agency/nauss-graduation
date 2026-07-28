@@ -377,12 +377,12 @@ body.page-viewer .stage img{
 
 /* Viewer pins: circular photo thumbnail instead of a plain gold dot, 50% bigger */
 .pin.pin-photo{
-  width:47px;
-  height:47px;
+  width:calc(47px * var(--standee-scale,1));
+  height:calc(47px * var(--standee-scale,1));
 }
 .pin.pin-photo .glow{
-  width:44px;
-  height:44px;
+  width:calc(44px * var(--standee-scale,1));
+  height:calc(44px * var(--standee-scale,1));
 }
 .pin.pin-photo .thumb-dot{
   position:absolute;
@@ -432,7 +432,7 @@ body.page-viewer .stage img{
 }
 .pin.pin-photo:hover .thumb-dot{transform:translate(-50%,-50%) scale(1.12);}
 .pin.pin-photo:focus-visible .thumb-dot{outline:2px solid var(--teal); outline-offset:3px;}
-.pin.pin-photo .label{left:32px;}
+.pin.pin-photo .label{left:calc(32px * var(--standee-scale,1));}
 
 /* ---------- 3D bird's-eye mode ---------- */
 
