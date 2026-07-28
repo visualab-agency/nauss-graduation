@@ -227,13 +227,23 @@ body.page-viewer .stage img{
   border:none;
   color:#181205;
   background:linear-gradient(135deg, var(--gold-light), var(--gold) 45%, #a97f34);
-  background-size:200% 200%;
   cursor:pointer;
+  position:relative;
   box-shadow:
     0 0 22px 4px rgba(233,207,152,0.55),
     0 8px 22px rgba(0,0,0,0.4);
-  animation:btn3dGlow 2.6s ease-in-out infinite;
   transition:transform .18s ease, box-shadow .18s ease;
+}
+.btn-3d-mode::after{
+  content:"";
+  position:absolute;
+  inset:-3px;
+  border-radius:inherit;
+  box-shadow:0 0 26px 7px rgba(233,207,152,0.85);
+  opacity:0;
+  pointer-events:none;
+  will-change:opacity;
+  animation:btn3dPulse 2.6s ease-in-out infinite;
 }
 .btn-3d-mode .btn-3d-icon{
   font-size:17px;
@@ -246,19 +256,12 @@ body.page-viewer .stage img{
     0 10px 26px rgba(0,0,0,0.45);
 }
 .btn-3d-mode:active{ transform:translateY(0) scale(0.98); }
-@keyframes btn3dGlow{
-  0%, 100%{
-    background-position:0% 50%;
-    box-shadow:
-      0 0 22px 4px rgba(233,207,152,0.55),
-      0 8px 22px rgba(0,0,0,0.4);
-  }
-  50%{
-    background-position:100% 50%;
-    box-shadow:
-      0 0 30px 8px rgba(233,207,152,0.8),
-      0 8px 22px rgba(0,0,0,0.4);
-  }
+/* Only opacity is animated here — animating box-shadow/background-position
+   directly (as this used to) forces a full repaint every frame, which is
+   what caused the visible flicker on mobile. Opacity is compositor-only. */
+@keyframes btn3dPulse{
+  0%, 100%{ opacity:0; }
+  50%{ opacity:1; }
 }
 @media (max-width: 760px){
   .btn-3d-mode{ font-size:13.5px; padding:12px 18px; }
@@ -267,6 +270,7 @@ body.page-viewer .stage img{
   .info-overlay{ max-width:calc(100% - 44px); padding:14px 16px; }
   .info-overlay p{ display:none; }
 }
+
 
 .stage-wrap{
   padding:10px clamp(18px,4vw,48px) 14px;
@@ -377,12 +381,12 @@ body.page-viewer .stage img{
 
 /* Viewer pins: circular photo thumbnail instead of a plain gold dot, 50% bigger */
 .pin.pin-photo{
-  width:calc(47px * var(--standee-scale,1));
-  height:calc(47px * var(--standee-scale,1));
+  width:calc(47px * var(--bubble-scale,1));
+  height:calc(47px * var(--bubble-scale,1));
 }
 .pin.pin-photo .glow{
-  width:calc(44px * var(--standee-scale,1));
-  height:calc(44px * var(--standee-scale,1));
+  width:calc(44px * var(--bubble-scale,1));
+  height:calc(44px * var(--bubble-scale,1));
 }
 .pin.pin-photo .thumb-dot{
   position:absolute;
@@ -432,7 +436,7 @@ body.page-viewer .stage img{
 }
 .pin.pin-photo:hover .thumb-dot{transform:translate(-50%,-50%) scale(1.12);}
 .pin.pin-photo:focus-visible .thumb-dot{outline:2px solid var(--teal); outline-offset:3px;}
-.pin.pin-photo .label{left:calc(32px * var(--standee-scale,1));}
+.pin.pin-photo .label{left:calc(32px * var(--bubble-scale,1));}
 
 /* ---------- 3D bird's-eye mode ---------- */
 
@@ -543,11 +547,11 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
   border-radius:6px;
   border-color:rgba(255,244,210,0.96);
   box-shadow:
-    0 0 20px 6px rgba(233,207,152,0.88),
-    0 0 42px 14px rgba(63,167,154,0.34),
-    0 10px 26px rgba(0,0,0,0.42),
-    inset 0 0 20px rgba(255,255,255,0.24),
-    inset 0 0 34px rgba(63,167,154,0.22),
+    0 0 calc(11px * var(--standee-scale,1)) calc(3px * var(--standee-scale,1)) rgba(233,207,152,0.7),
+    0 0 calc(22px * var(--standee-scale,1)) calc(7px * var(--standee-scale,1)) rgba(63,167,154,0.22),
+    0 calc(6px * var(--standee-scale,1)) calc(16px * var(--standee-scale,1)) rgba(0,0,0,0.42),
+    inset 0 0 calc(12px * var(--standee-scale,1)) rgba(255,255,255,0.22),
+    inset 0 0 calc(20px * var(--standee-scale,1)) rgba(63,167,154,0.18),
     0 0 0 2px rgba(11,14,18,0.78);
   transform:
     translate(-50%,-50%)

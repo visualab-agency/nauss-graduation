@@ -206,6 +206,7 @@
   // every resize/orientation change.
   function repositionPins(){
     stage.style.setProperty('--standee-scale', getMapStandeeScale(mapImg));
+    stage.style.setProperty('--bubble-scale', getMapBubbleScale(mapImg));
     mapPlane.querySelectorAll('.pin').forEach(el=>{
       const pin = pins[Number(el.dataset.pinIndex)];
       if(!pin) return;

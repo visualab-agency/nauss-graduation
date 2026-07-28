@@ -315,6 +315,20 @@ function getMapStandeeScale(img){
   return Math.min(STANDEE_MAX_SCALE, Math.max(STANDEE_MIN_SCALE, raw));
 }
 
+// The flat 2D circular markers don't have the same overlap problem the 3D
+// standees do (they're small dots, not wide cards), so they only need a
+// gentle size reduction on small screens rather than the full proportional
+// shrink — sqrt() eases the curve, and a higher floor keeps them tappable.
+const BUBBLE_MIN_SCALE = 0.62;
+const BUBBLE_MAX_SCALE = 1.08;
+
+function getMapBubbleScale(img){
+  const box = getRenderedImageBox(img);
+  if(!box.width) return 1;
+  const raw = box.width / STANDEE_REFERENCE_WIDTH;
+  return Math.min(BUBBLE_MAX_SCALE, Math.max(BUBBLE_MIN_SCALE, Math.sqrt(raw)));
+}
+
 // Converts a pin's stored x/y (% of the photo) into px coordinates
 // relative to img's offsetParent (i.e. the .stage element), so it can be
 // used directly as CSS left/top on an absolutely-positioned pin inside stage.
