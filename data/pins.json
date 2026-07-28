@@ -5,6 +5,7 @@
     "y": 54.48,
     "title": "Reception Tent",
     "category": "Parent and Student Reception",
+    "orientation": 1,
     "description": "Entrance Gate to the Tent",
     "mainImages": [
       {
@@ -18,11 +19,11 @@
     ],
     "extraImages": [
       {
-        "file": "pin-03-reception-tent-extra1.png",
+        "file": "pin-01-reception-tent-extra1.png",
         "caption": ""
       },
       {
-        "file": "pin-03-reception-tent-extra2.png",
+        "file": "pin-01-reception-tent-extra2.png",
         "caption": ""
       }
     ]
@@ -199,5 +200,46 @@
       }
     ],
     "extraImages": []
+  },
+  {
+    "id": "pky8ylse",
+    "x": 26.69,
+    "y": 83.29,
+    "title": "Side screens",
+    "category": "Graduation Photo Area",
+    "orientation": 1,
+    "description": "",
+    "mainImages": [
+      {
+        "file": "pin-10-side-screens-main1.jpg",
+        "caption": ""
+      }
+    ],
+    "extraImages": []
+  },
+  {
+    "id": "pulxtoq2",
+    "x": 61.53,
+    "y": 39.77,
+    "title": "Entrance to Tent Area",
+    "category": "Parents Entrance",
+    "orientation": 2,
+    "description": "Entrance gates to the Tent Area on the field",
+    "mainImages": [
+      {
+        "file": "pin-11-entrance-to-tent-area-main1.png",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-11-entrance-to-tent-area-main2.png",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": [
+      {
+        "file": "pin-11-entrance-to-tent-area-extra1.png",
+        "caption": "Option 03"
+      }
+    ]
   }
 ]
