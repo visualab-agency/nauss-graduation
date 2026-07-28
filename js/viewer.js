@@ -3,6 +3,10 @@
   const mapImg = document.getElementById('mapImg');
   const mapPlane = document.getElementById('mapPlane');
   const toggle3DBtn = document.getElementById('toggle3DBtn');
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const zoomResetBtn = document.getElementById('zoomResetBtn');
+  const zoomLevel = document.getElementById('zoomLevel');
   const overlay = document.getElementById('overlay');
   const mainPair = document.getElementById('mainPair');
   const vwTitle = document.getElementById('vwTitle');
@@ -16,6 +20,9 @@
   const extraImg = document.getElementById('extraImg');
   const extraCaption = document.getElementById('extraCaption');
   const extraCloseBtn = document.getElementById('extraCloseBtn');
+  const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+  const fullscreenImg = document.getElementById('fullscreenImg');
+  const fullscreenCloseBtn = document.getElementById('fullscreenCloseBtn');
 
   const pins = await loadPins();
   pinCount.textContent = `● ${pins.length} view${pins.length===1?'':'s'} loaded`;
@@ -26,7 +33,147 @@
   toggle3DBtn.addEventListener('click', ()=>{
     const isOn = stage.classList.toggle('is-3d');
     toggle3DBtn.textContent = isOn ? '2D View' : '3D View';
+    zoomPan.reset(); // pan/zoom + tilt together gets disorienting, so start clean on toggle
   });
+
+  /* ---------- Zoom / pan controller ---------- */
+  const zoomPan = (function(){
+    const MIN_SCALE = 1;
+    const MAX_SCALE = 4;
+    const DOUBLE_CLICK_SCALE = 2.5;
+    const DRAG_THRESHOLD = 4; // px of movement before a pointerdown counts as a drag, not a click
+
+    let scale = 1, panX = 0, panY = 0;
+    let dragging = false, dragMoved = false;
+    let dragStartX = 0, dragStartY = 0, dragStartPanX = 0, dragStartPanY = 0;
+    let pinchStartDist = 0, pinchStartScale = 1;
+    let activeTouches = 0;
+
+    function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+
+    function clampPan(){
+      const rect = stage.getBoundingClientRect();
+      const maxX = (rect.width * (scale - 1)) / 2;
+      const maxY = (rect.height * (scale - 1)) / 2;
+      panX = clamp(panX, -maxX, maxX);
+      panY = clamp(panY, -maxY, maxY);
+    }
+
+    function apply(animate){
+      clampPan();
+      mapPlane.classList.toggle('no-anim', !animate);
+      stage.style.setProperty('--zoom', scale);
+      stage.style.setProperty('--pan-x', panX + 'px');
+      stage.style.setProperty('--pan-y', panY + 'px');
+      stage.classList.toggle('zoomable', scale > 1);
+      zoomLevel.textContent = Math.round(scale * 100) + '%';
+      zoomInBtn.disabled = scale >= MAX_SCALE - 0.001;
+      zoomOutBtn.disabled = scale <= MIN_SCALE + 0.001;
+    }
+
+    // Zooms to newScale while keeping the point under (clientX, clientY) visually fixed.
+    function zoomAt(newScale, clientX, clientY, animate){
+      newScale = clamp(newScale, MIN_SCALE, MAX_SCALE);
+      const rect = stage.getBoundingClientRect();
+      const originX = clientX - rect.left - rect.width / 2;
+      const originY = clientY - rect.top - rect.height / 2;
+      const ratio = newScale / scale;
+      panX = originX - (originX - panX) * ratio;
+      panY = originY - (originY - panY) * ratio;
+      scale = newScale;
+      apply(animate);
+    }
+
+    function reset(){
+      scale = 1; panX = 0; panY = 0;
+      apply(true);
+    }
+
+    // Mouse wheel: zoom in/out centered on the cursor.
+    stage.addEventListener('wheel', (e)=>{
+      e.preventDefault();
+      const factor = Math.exp(-e.deltaY * 0.0015);
+      zoomAt(scale * factor, e.clientX, e.clientY, false);
+    }, { passive:false });
+
+    // Drag to pan once zoomed in. Ignored if it starts on a pin so pin clicks keep working.
+    stage.addEventListener('pointerdown', (e)=>{
+      if(scale <= 1) return;
+      if(e.target.closest('.pin')) return;
+      if(activeTouches >= 2) return;
+      dragging = true; dragMoved = false;
+      dragStartX = e.clientX; dragStartY = e.clientY;
+      dragStartPanX = panX; dragStartPanY = panY;
+      stage.setPointerCapture(e.pointerId);
+    });
+    stage.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      if(!dragMoved && Math.hypot(dx, dy) > DRAG_THRESHOLD){
+        dragMoved = true;
+        stage.classList.add('is-panning');
+      }
+      if(dragMoved){
+        panX = dragStartPanX + dx;
+        panY = dragStartPanY + dy;
+        apply(false);
+      }
+    });
+    function endDrag(e){
+      if(!dragging) return;
+      dragging = false;
+      stage.classList.remove('is-panning');
+      if(dragMoved){ clampPan(); apply(false); }
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    // Double-click: zoom in on the clicked spot, or back out to 1x if already zoomed.
+    stage.addEventListener('dblclick', (e)=>{
+      if(e.target.closest('.pin')) return;
+      if(scale > 1){ reset(); }
+      else { zoomAt(DOUBLE_CLICK_SCALE, e.clientX, e.clientY, true); }
+    });
+
+    // Pinch-to-zoom on touch devices.
+    stage.addEventListener('touchstart', (e)=>{
+      activeTouches = e.touches.length;
+      if(e.touches.length === 2){
+        dragging = false; // hand off from any single-finger drag in progress
+        stage.classList.remove('is-panning');
+        const [a, b] = e.touches;
+        pinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        pinchStartScale = scale;
+      }
+    }, { passive:true });
+    stage.addEventListener('touchmove', (e)=>{
+      if(e.touches.length === 2){
+        e.preventDefault();
+        const [a, b] = e.touches;
+        const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        const cx = (a.clientX + b.clientX) / 2;
+        const cy = (a.clientY + b.clientY) / 2;
+        const ratio = pinchStartDist ? dist / pinchStartDist : 1;
+        zoomAt(pinchStartScale * ratio, cx, cy, false);
+      }
+    }, { passive:false });
+    stage.addEventListener('touchend', (e)=>{ activeTouches = e.touches.length; });
+    stage.addEventListener('touchcancel', (e)=>{ activeTouches = e.touches.length; });
+
+    zoomInBtn.addEventListener('click', ()=>{
+      const rect = stage.getBoundingClientRect();
+      zoomAt(scale * 1.5, rect.left + rect.width / 2, rect.top + rect.height / 2, true);
+    });
+    zoomOutBtn.addEventListener('click', ()=>{
+      const rect = stage.getBoundingClientRect();
+      zoomAt(scale / 1.5, rect.left + rect.width / 2, rect.top + rect.height / 2, true);
+    });
+    zoomResetBtn.addEventListener('click', reset);
+
+    apply(false);
+    return { reset };
+  })();
 
   function renderPins(){
     mapPlane.querySelectorAll('.pin').forEach(p=>p.remove());
@@ -103,6 +250,9 @@
         ${m.caption ? `<p class="main-caption">${escapeHtml(m.caption)}</p>` : ''}
       </div>
     `).join('');
+    mainPair.querySelectorAll('img').forEach(img=>{
+      img.addEventListener('click', ()=> openFullscreen(img.src, img.alt));
+    });
   }
 
   function renderThumbs(mains, extras){
@@ -150,6 +300,19 @@
     extraCaption.textContent = ex.caption || '';
     extraOverlay.classList.add('open');
   }
+  extraImg.addEventListener('click', ()=> openFullscreen(extraImg.src, extraImg.alt));
+
+  function openFullscreen(src, alt){
+    fullscreenImg.src = src;
+    fullscreenImg.alt = alt || '';
+    fullscreenOverlay.classList.add('open');
+  }
+  function closeFullscreen(){
+    fullscreenOverlay.classList.remove('open');
+    fullscreenImg.src = '';
+  }
+  fullscreenCloseBtn.addEventListener('click', closeFullscreen);
+  fullscreenOverlay.addEventListener('click', closeFullscreen);
 
   function closeExtraOverlay(){
     extraOverlay.classList.remove('open');
@@ -170,7 +333,8 @@
   overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeViewer(); });
   document.addEventListener('keydown', (e)=>{
     if(e.key === 'Escape'){
-      if(extraOverlay.classList.contains('open')) closeExtraOverlay();
+      if(fullscreenOverlay.classList.contains('open')) closeFullscreen();
+      else if(extraOverlay.classList.contains('open')) closeExtraOverlay();
       else closeViewer();
     }
   });

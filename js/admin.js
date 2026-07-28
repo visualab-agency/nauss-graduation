@@ -231,7 +231,7 @@
         <span class="label">${safeTitle}</span>
       `;
       applyPinVisuals(el, pin, viewSettings);
-      el.addEventListener('click', (e)=>{ e.stopPropagation(); startEdit(pin.id); });
+      bindPinDrag(el, pin);
       mapPlane.appendChild(el);
     });
     if(draft){
@@ -243,6 +243,73 @@
       el.innerHTML = `<span class="glow"></span><span class="ring"></span><span class="dot"></span>`;
       mapPlane.appendChild(el);
     }
+  }
+
+  // Converts a pointer's client coords into %-of-photo coords (same space pins are stored in).
+  function clientToPinPercent(clientX, clientY){
+    const rect = mapImg.getBoundingClientRect();
+    const box = getRenderedImageBox(mapImg);
+    let relX = (clientX - rect.left) - box.left;
+    let relY = (clientY - rect.top) - box.top;
+    relX = Math.max(0, Math.min(box.width, relX));
+    relY = Math.max(0, Math.min(box.height, relY));
+    return { x: (relX / box.width) * 100, y: (relY / box.height) * 100 };
+  }
+
+  const DRAG_THRESHOLD = 4; // px of pointer movement before a press counts as a drag, not a click
+
+  // A placed pin can be clicked (opens the edit form, old behavior) or
+  // click-dragged to reposition it in place. Which one happens is only known
+  // once the pointer moves (or doesn't), so both live in one pointer flow.
+  function bindPinDrag(el, pin){
+    let dragState = null; // {startX, startY, moved}
+
+    el.addEventListener('pointerdown', (e)=>{
+      if(stage.classList.contains('is-3d')) return; // 3D preview isn't the placement coordinate space
+      e.stopPropagation();
+      dragState = { startX: e.clientX, startY: e.clientY, moved: false };
+      el.setPointerCapture(e.pointerId);
+    });
+
+    el.addEventListener('pointermove', (e)=>{
+      if(!dragState) return;
+      const dx = e.clientX - dragState.startX;
+      const dy = e.clientY - dragState.startY;
+      if(!dragState.moved && Math.hypot(dx, dy) > DRAG_THRESHOLD){
+        dragState.moved = true;
+        el.classList.add('dragging');
+      }
+      if(dragState.moved){
+        const pct = clientToPinPercent(e.clientX, e.clientY);
+        dragState.pct = pct;
+        const pos = pinToStagePx(pct, mapImg);
+        el.style.left = pos.left + 'px';
+        el.style.top = pos.top + 'px';
+      }
+    });
+
+    function endDrag(e){
+      if(!dragState) return;
+      el.releasePointerCapture(e.pointerId);
+      el.classList.remove('dragging');
+      if(dragState.moved){
+        if(dragState.pct){
+          const live = pins.find(p => p.id === pin.id);
+          if(live){
+            live.x = Math.round(dragState.pct.x * 100) / 100;
+            live.y = Math.round(dragState.pct.y * 100) / 100;
+          }
+          showToast(toast, 'Pin moved — click Export pins.json to save the new position.', 3800);
+        }
+        dragState = null;
+        renderDots(); // rebuilds from the updated pins array (also re-attaches drag handlers)
+      } else {
+        dragState = null;
+        startEdit(pin.id);
+      }
+    }
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
   }
 
   window.addEventListener('resize', renderDots);

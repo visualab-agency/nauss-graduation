@@ -17,7 +17,6 @@
     </div>
   </div>
   <div class="topbar-actions">
-    <button class="btn" id="toggle3DBtn">3D View</button>
     <span class="badge" id="pinCount">● 0 views loaded</span>
   </div>
 </header>
@@ -28,10 +27,17 @@
       <img src="assets/masterplan.jpg" alt="Event master plan" id="mapImg" draggable="false">
       <!-- pins injected here -->
     </div>
+    <div class="zoom-controls">
+      <button type="button" id="zoomInBtn" aria-label="Zoom in">+</button>
+      <span class="zoom-level" id="zoomLevel">100%</span>
+      <button type="button" id="zoomOutBtn" aria-label="Zoom out">−</button>
+      <button type="button" id="zoomResetBtn" aria-label="Reset zoom">⤾</button>
+    </div>
     <div class="info-overlay">
       <p class="eyebrow">Master Plan</p>
       <h2>Every gold marker is a designed moment.</h2>
       <p>Click any glowing point to preview the render for that spot. Close the preview to return here and explore another location.</p>
+      <button class="btn-3d-mode" id="toggle3DBtn"><span class="btn-3d-icon">◈</span> 3D MODE</button>
     </div>
   </div>
 </div>
@@ -60,6 +66,11 @@
       <button class="btn btn-gold" id="backBtn">← Back to master plan</button>
     </div>
   </div>
+</div>
+
+<div class="fullscreen-overlay" id="fullscreenOverlay">
+  <button class="icon-btn" id="fullscreenCloseBtn" aria-label="Close">✕</button>
+  <img id="fullscreenImg" src="" alt="">
 </div>
 
 <script src="js/common.js"></script>
