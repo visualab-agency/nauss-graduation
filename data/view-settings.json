@@ -1,0 +1,29 @@
+{
+  "tiltX": 38,
+  "tiltZ": 29,
+  "perspective": 6000,
+  "categories": {
+    "1": {
+      "pinTiltX": 19,
+      "pinTiltZ": 90,
+      "pinScaleX": 1.9,
+      "pinScaleY": 1.2,
+      "pinScaleZ": 1.05,
+      "pinSkew": -57,
+      "elevate": 14,
+      "labelLift": -128,
+      "labelOffsetX": 14
+    },
+    "2": {
+      "pinTiltX": 29,
+      "pinTiltZ": 1,
+      "pinScaleX": 1.65,
+      "pinScaleY": 1.65,
+      "pinScaleZ": 0.25,
+      "pinSkew": 35,
+      "elevate": 56,
+      "labelLift": -38,
+      "labelOffsetX": -79
+    }
+  }
+}

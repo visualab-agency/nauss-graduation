@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Place Renders on Map</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-admin">
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">N</div>
+    <div class="brand-text">
+      <p class="eyebrow">Admin · Not for client viewing</p>
+      <h1>Map Pin Editor</h1>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="badge" id="folderStatus">📁 Not connected</span>
+    <button class="btn" id="connectFolderBtn">Connect project folder</button>
+    <button class="btn" id="toggle3DBtn">3D Preview</button>
+    <span class="badge" id="pinCount">● 0 pins</span>
+    <button class="btn" id="loadExistingBtn">Reload pins.json</button>
+    <button class="btn btn-gold" id="exportBtn">Export pins.json</button>
+  </div>
+</header>
+
+<section class="hero">
+  <p class="eyebrow">Setup mode</p>
+  <h2>Click a spot on the plan, attach its render.</h2>
+  <p>Click anywhere on the master plan below to drop a marker, then choose the matching render image from your computer. Do this for all ~20 locations, then use <strong>Export pins.json</strong> and follow the on-screen filenames to finish the setup — full instructions are in <code>README.md</code>.</p>
+</section>
+
+<div class="perspective-panel" id="perspectivePanel" style="display:none;">
+  <h4>3D bird's-eye perspective (this is what the client-facing map will use)</h4>
+
+  <p class="hint">Map tilt — shared by everything on the map:</p>
+  <div class="persp-row">
+    <label><span>Tilt</span><span id="tiltXVal">55°</span></label>
+    <input type="range" id="tiltXSlider" min="-80" max="80" value="55">
+  </div>
+  <div class="persp-row">
+    <label><span>Corner angle</span><span id="tiltZVal">12°</span></label>
+    <input type="range" id="tiltZSlider" min="-90" max="90" value="12">
+  </div>
+  <div class="persp-row">
+    <label><span>Depth</span><span id="perspVal">1400px</span></label>
+    <input type="range" id="perspSlider" min="200" max="6000" step="50" value="1400">
+  </div>
+
+  <div class="category-switch">
+    <p class="hint">Pin orientation profile — every pin picks Category 1 or 2 when saved, and follows that profile's sliders below:</p>
+    <div class="category-tabs">
+      <button type="button" class="btn cat-tab active" id="editCat1Btn" data-cat="1">Editing: Category 1</button>
+      <button type="button" class="btn cat-tab" id="editCat2Btn" data-cat="2">Editing: Category 2</button>
+    </div>
+  </div>
+
+  <div class="persp-row">
+    <label><span>Pin tilt</span><span id="pinTiltXVal">55°</span></label>
+    <input type="range" id="pinTiltXSlider" min="-90" max="90" value="55">
+  </div>
+  <div class="persp-row">
+    <label><span>Pin corner angle</span><span id="pinTiltZVal">12°</span></label>
+    <input type="range" id="pinTiltZSlider" min="-90" max="90" value="12">
+  </div>
+  <div class="persp-row">
+    <label><span>Pin scale X</span><span id="pinScaleXVal">1.00</span></label>
+    <input type="range" id="pinScaleXSlider" min="0.25" max="3" step="0.05" value="1">
+  </div>
+  <div class="persp-row">
+    <label><span>Pin scale Y</span><span id="pinScaleYVal">1.00</span></label>
+    <input type="range" id="pinScaleYSlider" min="0.25" max="3" step="0.05" value="1">
+  </div>
+  <div class="persp-row">
+    <label><span>Pin scale Z</span><span id="pinScaleZVal">1.00</span></label>
+    <input type="range" id="pinScaleZSlider" min="0.25" max="4" step="0.05" value="1">
+  </div>
+  <div class="persp-row">
+    <label><span>Pin skew</span><span id="pinSkewVal">0°</span></label>
+    <input type="range" id="pinSkewSlider" min="-60" max="60" value="0">
+  </div>
+  <div class="persp-row">
+    <label><span>Pin elevation</span><span id="elevateVal">70px</span></label>
+    <input type="range" id="elevateSlider" min="-200" max="400" value="70">
+  </div>
+  <div class="persp-row">
+    <label><span>Label lift (text only)</span><span id="labelLiftVal">0px</span></label>
+    <input type="range" id="labelLiftSlider" min="-150" max="150" value="0">
+  </div>
+  <div class="persp-row">
+    <label><span>Label offset (text only)</span><span id="labelOffsetXVal">0px</span></label>
+    <input type="range" id="labelOffsetXSlider" min="-150" max="150" value="0">
+  </div>
+
+  <button class="btn btn-gold" id="savePerspectiveBtn">Save perspective settings</button>
+</div>
+
+<div class="admin-shell">
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+      <div class="map-plane" id="mapPlane">
+        <img src="assets/masterplan.jpg" alt="Event master plan" id="mapImg" draggable="false">
+      </div>
+    </div>
+  </div>
+
+  <aside class="side-panel">
+    <h3 id="formHeading">Add a location</h3>
+    <p class="hint">Click the map to set a point, or click an existing pin in the list below to edit it.</p>
+
+    <div id="formArea" style="display:none;">
+      <div class="field">
+        <label>Title (shown to clients)</label>
+        <input type="text" id="fTitle" placeholder="e.g. Reception Tent — Arrival Side">
+      </div>
+      <div class="field">
+        <label>Category (optional tag)</label>
+        <input type="text" id="fCategory" placeholder="e.g. VVIP Arrival">
+      </div>
+      <div class="field">
+        <label>Pin orientation profile (controls 3D tilt/scale/label for this pin)</label>
+        <div class="orientation-toggle">
+          <label class="radio-pill"><input type="radio" name="fOrientation" value="1" checked> Category 1</label>
+          <label class="radio-pill"><input type="radio" name="fOrientation" value="2"> Category 2</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Description (optional, shown under image)</label>
+        <textarea id="fDesc" placeholder="Short note for the client about this view"></textarea>
+      </div>
+      <div class="field">
+        <label>Main images (both shown together when the pin is opened)</label>
+        <div class="image-slot-pair">
+          <div class="image-slot">
+            <label class="file-drop" id="dropLabelMain1">
+              Main image 1
+              <input type="file" id="fFileMain1" accept="image/*" style="display:none;">
+              <div class="slot-preview" id="previewMain1"></div>
+            </label>
+            <input type="text" id="fCaptionMain1" class="caption-input" placeholder="Caption, e.g. Option 01">
+          </div>
+          <div class="image-slot">
+            <label class="file-drop" id="dropLabelMain2">
+              Main image 2
+              <input type="file" id="fFileMain2" accept="image/*" style="display:none;">
+              <div class="slot-preview" id="previewMain2"></div>
+            </label>
+            <input type="text" id="fCaptionMain2" class="caption-input" placeholder="Caption, e.g. Option 02">
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Extra images (optional, shown smaller in a strip below)</label>
+        <div class="image-slot-pair">
+          <div class="image-slot">
+            <label class="file-drop" id="dropLabelExtra1">
+              Extra image 1
+              <input type="file" id="fFileExtra1" accept="image/*" style="display:none;">
+              <div class="slot-preview" id="previewExtra1"></div>
+            </label>
+            <input type="text" id="fCaptionExtra1" class="caption-input" placeholder="Caption (optional)">
+          </div>
+          <div class="image-slot">
+            <label class="file-drop" id="dropLabelExtra2">
+              Extra image 2
+              <input type="file" id="fFileExtra2" accept="image/*" style="display:none;">
+              <div class="slot-preview" id="previewExtra2"></div>
+            </label>
+            <input type="text" id="fCaptionExtra2" class="caption-input" placeholder="Caption (optional)">
+          </div>
+        </div>
+      </div>
+      <div class="field" style="display:flex; gap:8px;">
+        <button class="btn btn-gold" id="savePinBtn" style="flex:1;">Save pin</button>
+        <button class="btn" id="cancelPinBtn">Cancel</button>
+      </div>
+      <p class="hint" id="filenameHint"></p>
+    </div>
+
+    <div class="pin-list">
+      <h4>Pins on this map</h4>
+      <div id="pinListItems"><p class="empty-state">No pins yet — click the map to add your first one.</p></div>
+    </div>
+  </aside>
+</div>
+
+<p class="footer-note">
+  This editor never uploads files to any server — everything happens in your browser. Click <strong>Connect project folder</strong>
+  once and pick your <code>nauss-event</code> project folder: after that, saving a pin writes its images straight into
+  <code>images/</code>, and <strong>Export pins.json</strong> writes straight into <code>data/pins.json</code> — no manual moving,
+  no Downloads folder. (Chrome/Edge only; other browsers fall back to downloading files for you to move in manually, as before.)
+</p>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+[
+  {
+    "id": "pp20ffni",
+    "x": 61.21,
+    "y": 54.48,
+    "title": "Reception Tent",
+    "category": "Parent and Student Reception",
+    "description": "Entrance Gate to the Tent",
+    "mainImages": [
+      {
+        "file": "pin-03-reception-tent-main1.png",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-03-reception-tent-main2.png",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": [
+      {
+        "file": "pin-03-reception-tent-extra1.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-03-reception-tent-extra2.png",
+        "caption": ""
+      }
+    ]
+  },
+  {
+    "id": "p79p0ze2",
+    "x": 24.69,
+    "y": 49.16,
+    "title": "Tunnel Journey",
+    "category": "Student Path",
+    "orientation": 2,
+    "description": "Air-conditioned closed tunnel for student passage toward the ceremony stage",
+    "mainImages": [
+      {
+        "file": "pin-02-tunnel-journey-main1.png",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-02-tunnel-journey-main2.png",
+        "caption": "Option 01"
+      }
+    ],
+    "extraImages": []
+  },
+  {
+    "id": "plmki4uh",
+    "x": 72.57,
+    "y": 32.79,
+    "title": "Parents Tunnel Journey",
+    "category": "Parents Arrival",
+    "description": "Tunnel Arches for welcoming the parents",
+    "mainImages": [
+      {
+        "file": "pin-03-parents-tunnel-journey-main1.png",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-03-parents-tunnel-journey-main2.jpg",
+        "caption": "Option 01"
+      }
+    ],
+    "extraImages": [
+      {
+        "file": "pin-03-parents-tunnel-journey-extra1.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-03-parents-tunnel-journey-extra2.png",
+        "caption": ""
+      }
+    ]
+  },
+  {
+    "id": "ppxl07rx",
+    "x": 19.78,
+    "y": 75.09,
+    "title": "Stage design",
+    "category": "Graduation ceremony",
+    "orientation": 1,
+    "description": "Graduation Ceremony stage design, with main led wall and side projection on auditorium side walls",
+    "mainImages": [
+      {
+        "file": "pin-04-graduation-ceremony-stage-design-main1.jpg",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-04-graduation-ceremony-stage-design-main2.jpg",
+        "caption": "Option 01"
+      }
+    ],
+    "extraImages": []
+  },
+  {
+    "id": "pa9x95pt",
+    "x": 56.91,
+    "y": 44.45,
+    "title": "Student Journey",
+    "category": "Student Path",
+    "orientation": 1,
+    "description": "Passage through the long corridor accompanied with branded elements and screens",
+    "mainImages": [
+      {
+        "file": "pin-05-student-journey-main1.jpg",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-05-student-journey-main2.jpg",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": []
+  },
+  {
+    "id": "p61diljz",
+    "x": 10.31,
+    "y": 59.22,
+    "title": "Outdoor Welcoming sign",
+    "category": "VVIP/VIP Arrival",
+    "orientation": 1,
+    "description": "Triangular Welcoming sign for arriving Guests",
+    "mainImages": [
+      {
+        "file": "pin-06-outdoor-welcoming-sign-main1.jpg",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-06-outdoor-welcoming-sign-main2.jpg",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": []
+  },
+  {
+    "id": "pyx8qxlt",
+    "x": 23.21,
+    "y": 85.69,
+    "title": "Graduation Photo",
+    "category": "End of ceremony and photo with official representative",
+    "orientation": 2,
+    "description": "Mockup of the photo setup with carpet and fit out of the existing building",
+    "mainImages": [
+      {
+        "file": "pin-07-graduation-photo-main1.jpg",
+        "caption": ""
+      }
+    ],
+    "extraImages": []
+  },
+  {
+    "id": "pixtzdcw",
+    "x": 17.12,
+    "y": 80.7,
+    "title": "VVIP welcoming tunnel",
+    "category": "Arrival and Departure of VVIP welcoming arches",
+    "orientation": 2,
+    "description": "Arches to welcome VVIP with branded wall to hide parking area",
+    "mainImages": [
+      {
+        "file": "pin-08-vvip-welcoming-tunnel-main1.jpg",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-08-vvip-welcoming-tunnel-main2.jpg",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": [
+      {
+        "file": "pin-08-vvip-welcoming-tunnel-extra1.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-08-vvip-welcoming-tunnel-extra2.png",
+        "caption": ""
+      }
+    ]
+  },
+  {
+    "id": "pgar0brp",
+    "x": 73.62,
+    "y": 9.3,
+    "title": "Welcoming sign",
+    "category": "Parents Arrival",
+    "orientation": 1,
+    "description": "2 sided Welcoming sign for arriving Parents",
+    "mainImages": [
+      {
+        "file": "pin-09-welcoming-sign-main1.png",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-09-welcoming-sign-main2.jpg",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": []
+  }
+]

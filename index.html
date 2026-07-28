@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAUSS Graduation Ceremony — Interactive Site Map</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-viewer">
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">N</div>
+    <div class="brand-text">
+      <p class="eyebrow">Naif Arab University for Security Sciences</p>
+      <h1>Graduation Ceremony — Site Design Preview</h1>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn" id="toggle3DBtn">3D View</button>
+    <span class="badge" id="pinCount">● 0 views loaded</span>
+  </div>
+</header>
+
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="map-plane" id="mapPlane">
+      <img src="assets/masterplan.jpg" alt="Event master plan" id="mapImg" draggable="false">
+      <!-- pins injected here -->
+    </div>
+    <div class="info-overlay">
+      <p class="eyebrow">Master Plan</p>
+      <h2>Every gold marker is a designed moment.</h2>
+      <p>Click any glowing point to preview the render for that spot. Close the preview to return here and explore another location.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="overlay" id="overlay">
+  <div class="viewer">
+    <div class="viewer-head">
+      <div>
+        <p class="eyebrow" id="vwCat">Location</p>
+        <h3 id="vwTitle">Title</h3>
+      </div>
+      <button class="icon-btn" id="closeBtn" aria-label="Close">✕</button>
+    </div>
+    <div class="viewer-body">
+      <div class="main-pair" id="mainPair"></div>
+      <div class="extra-overlay" id="extraOverlay">
+        <button class="icon-btn" id="extraCloseBtn" aria-label="Close">✕</button>
+        <img id="extraImg" src="" alt="">
+        <p class="extra-caption" id="extraCaption"></p>
+      </div>
+    </div>
+    <div class="thumb-strip" id="thumbStrip"></div>
+    <div class="viewer-foot">
+      <p id="vwDesc"></p>
+      <button class="btn btn-gold" id="backBtn">← Back to master plan</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/viewer.js"></script>
+</body>
+</html>
