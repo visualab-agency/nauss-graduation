@@ -278,5 +278,21 @@
         "caption": "Option 03"
       }
     ]
+  },
+  {
+    "id": "pbv5qhvd",
+    "x": 29.58,
+    "y": 56.99,
+    "title": "Exhibition",
+    "category": "",
+    "orientation": 1,
+    "description": "",
+    "mainImages": [
+      {
+        "file": "pin-13-exhibition-main1.png",
+        "caption": ""
+      }
+    ],
+    "extraImages": []
   }
 ]
