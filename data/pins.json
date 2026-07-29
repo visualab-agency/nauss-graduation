@@ -23,7 +23,15 @@
         "caption": ""
       },
       {
-        "file": "pin-01-reception-tent-extra2.png",
+        "file": "pin-01-reception-tent-extra2.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-01-reception-tent-extra3.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-01-reception-tent-extra4.jpg",
         "caption": ""
       }
     ]
@@ -238,6 +246,35 @@
     "extraImages": [
       {
         "file": "pin-11-entrance-to-tent-area-extra1.png",
+        "caption": "Option 03"
+      }
+    ]
+  },
+  {
+    "id": "pn6oefbg",
+    "x": 18.81,
+    "y": 59.03,
+    "title": "Guest Entrance",
+    "category": "Drop off Zone",
+    "orientation": 1,
+    "description": "Oval roundabout branding and Entrance Tunnel Options for Vip Guests stepping into the tower interior on their way to the Auditorium",
+    "mainImages": [
+      {
+        "file": "pin-12-guest-entrance-main1.png",
+        "caption": "Branding"
+      }
+    ],
+    "extraImages": [
+      {
+        "file": "pin-12-guest-entrance-extra1.jpg",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-12-guest-entrance-extra2.jpg",
+        "caption": "Option 02"
+      },
+      {
+        "file": "pin-12-guest-entrance-extra3.jpg",
         "caption": "Option 03"
       }
     ]

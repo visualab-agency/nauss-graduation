@@ -158,19 +158,69 @@
   const cancelPinBtn = document.getElementById('cancelPinBtn');
   const filenameHint = document.getElementById('filenameHint');
 
-  // Four independent upload slots: 2 main images (shown together), 2 extra images (shown in the strip).
+  // Two fixed main-image slots (shown together), plus a dynamic, unlimited list of extra-image slots.
   const slotConfig = [
     { key:'main1',  fileInput:'fFileMain1',  captionInput:'fCaptionMain1',  preview:'previewMain1',  suffix:'main1'  },
-    { key:'main2',  fileInput:'fFileMain2',  captionInput:'fCaptionMain2',  preview:'previewMain2',  suffix:'main2'  },
-    { key:'extra1', fileInput:'fFileExtra1', captionInput:'fCaptionExtra1', preview:'previewExtra1', suffix:'extra1' },
-    { key:'extra2', fileInput:'fFileExtra2', captionInput:'fCaptionExtra2', preview:'previewExtra2', suffix:'extra2' }
+    { key:'main2',  fileInput:'fFileMain2',  captionInput:'fCaptionMain2',  preview:'previewMain2',  suffix:'main2'  }
   ];
+  const extraSlotsContainer = document.getElementById('extraSlotsContainer');
+  const addExtraSlotBtn = document.getElementById('addExtraSlotBtn');
+  let extraSlotsState = []; // [{ uid, file, caption, existingFile }]
+
+  function makeExtraSlotUid(){ return 'x' + Math.random().toString(36).slice(2,9); }
+
+  function addExtraSlot(existing){
+    extraSlotsState.push({
+      uid: makeExtraSlotUid(),
+      file: null,
+      caption: existing ? (existing.caption || '') : '',
+      existingFile: existing ? existing.file : null
+    });
+    renderExtraSlots();
+  }
+
+  function removeExtraSlot(uid){
+    extraSlotsState = extraSlotsState.filter(s => s.uid !== uid);
+    renderExtraSlots();
+  }
+
+  function renderExtraSlots(){
+    extraSlotsContainer.innerHTML = '';
+    extraSlotsState.forEach(slot=>{
+      const row = document.createElement('div');
+      row.className = 'extra-slot-row';
+      row.innerHTML = `
+        <button type="button" class="remove-slot-btn" title="Remove this extra image">✕</button>
+        <label class="file-drop">
+          Extra image
+          <input type="file" accept="image/*" style="display:none;">
+          <div class="slot-preview">${slot.existingFile ? `<img src="images/${slot.existingFile}" alt=""><span class="slot-filename">${slot.existingFile}</span>` : ''}</div>
+        </label>
+        <input type="text" class="caption-input" placeholder="Caption (optional)" value="${slot.caption ? slot.caption.replace(/"/g,'&quot;') : ''}">
+      `;
+      const fileEl = row.querySelector('input[type=file]');
+      const previewEl = row.querySelector('.slot-preview');
+      const captionEl = row.querySelector('.caption-input');
+      fileEl.addEventListener('change', ()=>{
+        const file = fileEl.files[0];
+        if(!file) return;
+        slot.file = file;
+        const url = URL.createObjectURL(file);
+        previewEl.innerHTML = `<img src="${url}" alt="preview">`;
+      });
+      captionEl.addEventListener('input', ()=>{ slot.caption = captionEl.value; });
+      row.querySelector('.remove-slot-btn').addEventListener('click', ()=> removeExtraSlot(slot.uid));
+      extraSlotsContainer.appendChild(row);
+    });
+  }
+
+  addExtraSlotBtn.addEventListener('click', ()=> addExtraSlot(null));
 
   let pins = [];
   let draft = null;      // {x,y} pending new pin, or null
   let editingId = null;  // id of pin being edited, or null
   let nextNum = 1;
-  let selectedFiles = { main1:null, main2:null, extra1:null, extra2:null };
+  let selectedFiles = { main1:null, main2:null };
   let existingSlotsRef = {}; // filled in openForm when editing, used as fallback if a slot isn't re-uploaded
 
   function uid(){ return 'p' + Math.random().toString(36).slice(2,9); }
@@ -231,7 +281,7 @@
         <span class="label">${safeTitle}</span>
       `;
       applyPinVisuals(el, pin, viewSettings);
-      bindPinDrag(el, pin);
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); startEdit(pin.id); });
       mapPlane.appendChild(el);
     });
     if(draft){
@@ -243,73 +293,6 @@
       el.innerHTML = `<span class="glow"></span><span class="ring"></span><span class="dot"></span>`;
       mapPlane.appendChild(el);
     }
-  }
-
-  // Converts a pointer's client coords into %-of-photo coords (same space pins are stored in).
-  function clientToPinPercent(clientX, clientY){
-    const rect = mapImg.getBoundingClientRect();
-    const box = getRenderedImageBox(mapImg);
-    let relX = (clientX - rect.left) - box.left;
-    let relY = (clientY - rect.top) - box.top;
-    relX = Math.max(0, Math.min(box.width, relX));
-    relY = Math.max(0, Math.min(box.height, relY));
-    return { x: (relX / box.width) * 100, y: (relY / box.height) * 100 };
-  }
-
-  const DRAG_THRESHOLD = 4; // px of pointer movement before a press counts as a drag, not a click
-
-  // A placed pin can be clicked (opens the edit form, old behavior) or
-  // click-dragged to reposition it in place. Which one happens is only known
-  // once the pointer moves (or doesn't), so both live in one pointer flow.
-  function bindPinDrag(el, pin){
-    let dragState = null; // {startX, startY, moved}
-
-    el.addEventListener('pointerdown', (e)=>{
-      if(stage.classList.contains('is-3d')) return; // 3D preview isn't the placement coordinate space
-      e.stopPropagation();
-      dragState = { startX: e.clientX, startY: e.clientY, moved: false };
-      el.setPointerCapture(e.pointerId);
-    });
-
-    el.addEventListener('pointermove', (e)=>{
-      if(!dragState) return;
-      const dx = e.clientX - dragState.startX;
-      const dy = e.clientY - dragState.startY;
-      if(!dragState.moved && Math.hypot(dx, dy) > DRAG_THRESHOLD){
-        dragState.moved = true;
-        el.classList.add('dragging');
-      }
-      if(dragState.moved){
-        const pct = clientToPinPercent(e.clientX, e.clientY);
-        dragState.pct = pct;
-        const pos = pinToStagePx(pct, mapImg);
-        el.style.left = pos.left + 'px';
-        el.style.top = pos.top + 'px';
-      }
-    });
-
-    function endDrag(e){
-      if(!dragState) return;
-      el.releasePointerCapture(e.pointerId);
-      el.classList.remove('dragging');
-      if(dragState.moved){
-        if(dragState.pct){
-          const live = pins.find(p => p.id === pin.id);
-          if(live){
-            live.x = Math.round(dragState.pct.x * 100) / 100;
-            live.y = Math.round(dragState.pct.y * 100) / 100;
-          }
-          showToast(toast, 'Pin moved — click Export pins.json to save the new position.', 3800);
-        }
-        dragState = null;
-        renderDots(); // rebuilds from the updated pins array (also re-attaches drag handlers)
-      } else {
-        dragState = null;
-        startEdit(pin.id);
-      }
-    }
-    el.addEventListener('pointerup', endDrag);
-    el.addEventListener('pointercancel', endDrag);
   }
 
   window.addEventListener('resize', renderDots);
@@ -373,33 +356,36 @@
     renderDots();
   });
 
-  // Maps a pin (new or legacy schema) into slot data: {main1:{file,caption}|null, main2:..., extra1:..., extra2:...}
-  function getExistingSlotData(pin){
-    if(!pin) return { main1:null, main2:null, extra1:null, extra2:null };
+  // Maps a pin (new or legacy schema) into the two fixed main slots: {main1:{file,caption}|null, main2:...}
+  function getExistingMainSlotData(pin){
+    if(!pin) return { main1:null, main2:null };
     if(pin.mainImages || pin.extraImages){
       const mains = pin.mainImages || [];
-      const extras = pin.extraImages || [];
-      return {
-        main1: mains[0] || null,
-        main2: mains[1] || null,
-        extra1: extras[0] || null,
-        extra2: extras[1] || null
-      };
+      return { main1: mains[0] || null, main2: mains[1] || null };
     }
-    // Legacy schema: images[0] was the single main image, images[1..] were extras.
+    // Legacy schema: images[0] was the single main image.
     const imgs = (pin.images && pin.images.length) ? pin.images : (pin.image ? [pin.image] : []);
     return {
       main1: imgs[0] ? { file: imgs[0], caption:'' } : null,
-      main2: null,
-      extra1: imgs[1] ? { file: imgs[1], caption:'' } : null,
-      extra2: imgs[2] ? { file: imgs[2], caption:'' } : null
+      main2: null
     };
+  }
+
+  // Maps a pin (new or legacy schema) into its list of extra images: [{file,caption}, ...]
+  function getExistingExtraImages(pin){
+    if(!pin) return [];
+    if(pin.mainImages || pin.extraImages){
+      return pin.extraImages || [];
+    }
+    // Legacy schema: images[1..] were extras.
+    const imgs = (pin.images && pin.images.length) ? pin.images : (pin.image ? [pin.image] : []);
+    return imgs.slice(1).map(f => ({ file:f, caption:'' }));
   }
 
   function openForm(existingPin){
     formArea.style.display = 'block';
-    selectedFiles = { main1:null, main2:null, extra1:null, extra2:null };
-    existingSlotsRef = getExistingSlotData(existingPin);
+    selectedFiles = { main1:null, main2:null };
+    existingSlotsRef = getExistingMainSlotData(existingPin);
 
     slotConfig.forEach(cfg=>{
       const fileEl = document.getElementById(cfg.fileInput);
@@ -412,6 +398,10 @@
         ? `<img src="images/${existing.file}" alt=""><span class="slot-filename">${existing.file}</span>`
         : '';
     });
+
+    extraSlotsState = [];
+    getExistingExtraImages(existingPin).forEach(img => addExtraSlot(img));
+    renderExtraSlots();
 
     if(existingPin){
       formHeading.textContent = 'Edit location';
@@ -448,7 +438,7 @@
 
   cancelPinBtn.addEventListener('click', closeForm);
 
-  // Wire up the 4 file slots: choosing a file previews it immediately.
+  // Wire up the 2 fixed main-image slots; choosing a file previews it immediately.
   slotConfig.forEach(cfg=>{
     const fileEl = document.getElementById(cfg.fileInput);
     const previewEl = document.getElementById(cfg.preview);
@@ -466,7 +456,7 @@
     const title = fTitle.value.trim();
     if(!title){ showToast(toast, 'Give this location a title.'); fTitle.focus(); return; }
 
-    const hasNewFiles = Object.values(selectedFiles).some(f => !!f);
+    const hasNewFiles = Object.values(selectedFiles).some(f => !!f) || extraSlotsState.some(s => !!s.file);
     if(hasNewFiles && fsSupported() && !isProjectFolderConnected()){
       showToast(toast, 'Not connected to your project folder. Click "Connect project folder" above, then hit Save pin again.', 5200);
       return;
@@ -499,8 +489,27 @@
 
     const main1  = await resolveSlot(slotConfig[0]);
     const main2  = await resolveSlot(slotConfig[1]);
-    const extra1 = await resolveSlot(slotConfig[2]);
-    const extra2 = await resolveSlot(slotConfig[3]);
+
+    async function resolveExtraSlot(slot, idx){
+      const caption = (slot.caption || '').trim();
+      if(slot.file){
+        const ext = (slot.file.name.split('.').pop() || 'jpg').toLowerCase();
+        const filename = `pin-${paddedNum}-${slugify(title)}-extra${idx+1}.${ext}`;
+        const savedDirectly = await downloadBlob(filename, slot.file);
+        (savedDirectly ? savedNames : fallbackNames).push(filename);
+        return { file: filename, caption };
+      }
+      if(slot.existingFile){
+        return { file: slot.existingFile, caption };
+      }
+      return null;
+    }
+
+    const extraResults = [];
+    for(let i = 0; i < extraSlotsState.length; i++){
+      const res = await resolveExtraSlot(extraSlotsState[i], extraResults.length);
+      if(res) extraResults.push(res);
+    }
 
     if(!main1 && !main2){
       showToast(toast, 'Add at least one main image.');
@@ -514,7 +523,7 @@
     }
 
     const mainImages = [main1, main2].filter(Boolean);
-    const extraImages = [extra1, extra2].filter(Boolean);
+    const extraImages = extraResults;
     const selectedOrientation = document.querySelector('input[name="fOrientation"]:checked');
     const orientation = selectedOrientation && selectedOrientation.value === '2' ? 2 : 1;
 

@@ -210,67 +210,10 @@ body.page-viewer .stage img{
   line-height:1.55;
   margin:0;
 }
-
-.btn-3d-mode{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  width:100%;
-  margin-top:16px;
-  padding:14px 22px;
-  font-family:'Inter', sans-serif;
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:0.08em;
-  border-radius:999px;
-  border:none;
-  color:#181205;
-  background:linear-gradient(135deg, var(--gold-light), var(--gold) 45%, #a97f34);
-  cursor:pointer;
-  position:relative;
-  box-shadow:
-    0 0 22px 4px rgba(233,207,152,0.55),
-    0 8px 22px rgba(0,0,0,0.4);
-  transition:transform .18s ease, box-shadow .18s ease;
-}
-.btn-3d-mode::after{
-  content:"";
-  position:absolute;
-  inset:-3px;
-  border-radius:inherit;
-  box-shadow:0 0 26px 7px rgba(233,207,152,0.85);
-  opacity:0;
-  pointer-events:none;
-  will-change:opacity;
-  animation:btn3dPulse 2.6s ease-in-out infinite;
-}
-.btn-3d-mode .btn-3d-icon{
-  font-size:17px;
-  line-height:1;
-}
-.btn-3d-mode:hover{
-  transform:translateY(-2px) scale(1.03);
-  box-shadow:
-    0 0 30px 8px rgba(233,207,152,0.75),
-    0 10px 26px rgba(0,0,0,0.45);
-}
-.btn-3d-mode:active{ transform:translateY(0) scale(0.98); }
-/* Only opacity is animated here — animating box-shadow/background-position
-   directly (as this used to) forces a full repaint every frame, which is
-   what caused the visible flicker on mobile. Opacity is compositor-only. */
-@keyframes btn3dPulse{
-  0%, 100%{ opacity:0; }
-  50%{ opacity:1; }
-}
-@media (max-width: 760px){
-  .btn-3d-mode{ font-size:13.5px; padding:12px 18px; }
-}
 @media (max-width: 760px){
   .info-overlay{ max-width:calc(100% - 44px); padding:14px 16px; }
   .info-overlay p{ display:none; }
 }
-
 
 .stage-wrap{
   padding:10px clamp(18px,4vw,48px) 14px;
@@ -323,8 +266,18 @@ body.page-viewer .stage img{
   outline:none;
   -webkit-appearance:none;
   appearance:none;
+  --pin-boost:1;
+  transition:opacity .2s ease;
 }
 .pin:focus{outline:none;}
+
+/* Preview/select states: hovering (mouse) or first tap boosts a pin so it's
+   unmistakable which one will open on the next click; other pins on the map
+   shrink and fade slightly so the highlighted one reads clearly. Driven by
+   JS-toggled classes (viewer.js) rather than :hover alone, so touch's
+   tap-to-select-then-tap-to-open flow gets the same visual as desktop hover. */
+.pin.is-focused{ --pin-boost:1.16; z-index:8; }
+.pin.is-dimmed{ --pin-boost:0.85; opacity:0.55; z-index:4; }
 .pin .ring{
   position:absolute;
   inset:0;
@@ -381,12 +334,12 @@ body.page-viewer .stage img{
 
 /* Viewer pins: circular photo thumbnail instead of a plain gold dot, 50% bigger */
 .pin.pin-photo{
-  width:calc(47px * var(--bubble-scale,1));
-  height:calc(47px * var(--bubble-scale,1));
+  width:47px;
+  height:47px;
 }
 .pin.pin-photo .glow{
-  width:calc(44px * var(--bubble-scale,1));
-  height:calc(44px * var(--bubble-scale,1));
+  width:44px;
+  height:44px;
 }
 .pin.pin-photo .thumb-dot{
   position:absolute;
@@ -403,7 +356,8 @@ body.page-viewer .stage img{
     inset 0 0 18px rgba(255,255,255,0.22),
     inset 0 0 32px rgba(63,167,154,0.18),
     0 0 0 2px rgba(11,14,18,0.7);
-  transition:transform .15s ease;
+  transition:transform .18s ease;
+  transform:translate(-50%,-50%) scale(var(--pin-boost,1));
 }
 .pin.pin-photo .thumb-dot::before{
   content:"";
@@ -434,9 +388,8 @@ body.page-viewer .stage img{
   display:block;
   filter:brightness(1.22) contrast(1.08) saturate(1.14);
 }
-.pin.pin-photo:hover .thumb-dot{transform:translate(-50%,-50%) scale(1.12);}
 .pin.pin-photo:focus-visible .thumb-dot{outline:2px solid var(--teal); outline-offset:3px;}
-.pin.pin-photo .label{left:calc(32px * var(--bubble-scale,1));}
+.pin.pin-photo .label{left:32px;}
 
 /* ---------- 3D bird's-eye mode ---------- */
 
@@ -448,50 +401,11 @@ body.page-viewer .stage img{
   position:relative;
   transform-style: preserve-3d;
   transition: transform 0.9s cubic-bezier(.4,.1,.2,1);
-  transform: translate(var(--pan-x,0px), var(--pan-y,0px)) scale(var(--zoom,1)) rotateX(0deg) rotateZ(0deg);
+  transform: rotateX(0deg) rotateZ(0deg);
 }
 body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; justify-content:center; }
 .stage.is-3d .map-plane{
-  transform: translate(var(--pan-x,0px), var(--pan-y,0px)) scale(var(--zoom,1)) rotateX(var(--tilt-x,55deg)) rotateZ(var(--tilt-z,12deg));
-}
-.map-plane.no-anim{ transition:none; }
-
-/* ---------- Zoom / pan (client viewer) ---------- */
-.stage.zoomable{ cursor: grab; touch-action:none; }
-.stage.zoomable.is-panning{ cursor: grabbing; }
-
-.zoom-controls{
-  position:absolute;
-  right:16px;
-  bottom:16px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  z-index:30;
-}
-.zoom-controls button{
-  width:38px;height:38px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  background:rgba(11,14,18,0.72);
-  backdrop-filter:blur(10px);
-  color:var(--text);
-  font-size:18px;
-  line-height:1;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s ease;
-}
-.zoom-controls button:hover{ border-color:var(--gold); color:var(--gold-light); }
-.zoom-controls button:disabled{ opacity:0.35; cursor:not-allowed; }
-.zoom-controls .zoom-level{
-  text-align:center;
-  font-size:10.5px;
-  color:var(--text-dim);
-  background:rgba(11,14,18,0.72);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:3px 0;
+  transform: rotateX(var(--tilt-x,55deg)) rotateZ(var(--tilt-z,12deg));
 }
 
 /* Admin uses the same thumbnail standees as the client view while previewing the tilt. */
@@ -509,7 +423,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
 }
 .stage.is-3d .pin-stalk{
   opacity:.85;
-  height:calc(var(--pin-lift,70px) * var(--standee-scale,1));
+  height:var(--pin-lift,70px);
 }
 
 /* Small caption that rides just under the standee card in 3D mode */
@@ -531,37 +445,36 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
   display:block;
   transform-origin:center bottom;
   transform:
-    translate(calc(-50% + (var(--label-offset-x,0px) * var(--standee-scale,1))), -50%)
-    translateY(calc(-1 * var(--pin-label-lift,136px) * var(--standee-scale,1)))
+    translate(calc(-50% + var(--label-offset-x,0px)), -50%)
+    translateY(calc(-1 * var(--pin-label-lift,136px)))
     rotateZ(calc(-1 * var(--pin-tilt-z,12deg)))
     rotateX(calc(-1 * var(--pin-tilt-x,55deg)))
     skewX(var(--pin-skew,0deg))
-    scale3d(calc(var(--pin-scale-x,1) * var(--standee-scale,1)), calc(var(--pin-scale-y,1) * var(--standee-scale,1)), var(--pin-scale-z,1));
+    scale3d(calc(var(--pin-scale-x,1) * var(--pin-boost,1)), calc(var(--pin-scale-y,1) * var(--pin-boost,1)), var(--pin-scale-z,1));
 }
 
 /* The circular thumbnail becomes an elevated, upright rectangular standee in 3D mode.
    Pin tilt can be tuned separately from the map-plane's own tilt. */
 .stage.is-3d .pin.pin-photo .thumb-dot{
-  width:calc(90px * var(--standee-scale,1));
-  height:calc(60px * var(--standee-scale,1));
+  width:90px; height:60px;
   border-radius:6px;
   border-color:rgba(255,244,210,0.96);
   box-shadow:
-    0 0 calc(11px * var(--standee-scale,1)) calc(3px * var(--standee-scale,1)) rgba(233,207,152,0.7),
-    0 0 calc(22px * var(--standee-scale,1)) calc(7px * var(--standee-scale,1)) rgba(63,167,154,0.22),
-    0 calc(6px * var(--standee-scale,1)) calc(16px * var(--standee-scale,1)) rgba(0,0,0,0.42),
-    inset 0 0 calc(12px * var(--standee-scale,1)) rgba(255,255,255,0.22),
-    inset 0 0 calc(20px * var(--standee-scale,1)) rgba(63,167,154,0.18),
+    0 0 20px 6px rgba(233,207,152,0.88),
+    0 0 42px 14px rgba(63,167,154,0.34),
+    0 10px 26px rgba(0,0,0,0.42),
+    inset 0 0 20px rgba(255,255,255,0.24),
+    inset 0 0 34px rgba(63,167,154,0.22),
     0 0 0 2px rgba(11,14,18,0.78);
   transform:
     translate(-50%,-50%)
-    translateY(calc(-1 * var(--pin-lift,70px) * var(--standee-scale,1)))
+    translateY(calc(-1 * var(--pin-lift,70px)))
     rotateZ(calc(-1 * var(--pin-tilt-z,12deg)))
     rotateX(calc(-1 * var(--pin-tilt-x,55deg)))
     skewX(var(--pin-skew,0deg))
-    scale3d(var(--pin-scale-x,1), var(--pin-scale-y,1), var(--pin-scale-z,1));
+    scale3d(calc(var(--pin-scale-x,1) * var(--pin-boost,1)), calc(var(--pin-scale-y,1) * var(--pin-boost,1)), var(--pin-scale-z,1));
   transform-origin:center bottom;
-  transition: width .5s ease, height .5s ease, border-radius .5s ease, transform .7s cubic-bezier(.4,.1,.2,1);
+  transition: width .5s ease, height .5s ease, border-radius .5s ease, transform .45s cubic-bezier(.4,.1,.2,1);
 }
 .stage.is-3d .pin.pin-photo .label{ display:none; }
 
@@ -785,33 +698,6 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
 }
 .icon-btn:hover{border-color:var(--gold); color:var(--gold-light);}
 
-/* Fullscreen image view (click a displayed main/extra image to enlarge) */
-.fullscreen-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(4,5,7,0.97);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:300;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .2s ease;
-  padding:24px;
-}
-.fullscreen-overlay.open{opacity:1; pointer-events:auto;}
-.fullscreen-overlay img{
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-  border-radius:4px;
-}
-.fullscreen-overlay .icon-btn{
-  position:absolute;
-  top:20px; right:20px;
-}
-.main-item img, .extra-overlay img{cursor:zoom-in;}
-
 /* Admin panel */
 .admin-shell{display:grid; grid-template-columns:1fr 340px; gap:0; align-items:start;}
 @media (max-width: 980px){.admin-shell{grid-template-columns:1fr;}}
@@ -1028,6 +914,43 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
   font-family:'Inter', sans-serif;
 }
 .caption-input:focus{outline:none; border-color:var(--gold);}
+
+.extra-slots{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:10px;
+}
+.extra-slot-row{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel-2);
+}
+.extra-slot-row .file-drop{
+  padding:12px 8px;
+  font-size:11.5px;
+}
+.extra-slot-row .remove-slot-btn{
+  position:absolute;
+  top:8px;
+  right:8px;
+  background:none;
+  border:1px solid var(--line);
+  color:var(--text-dim);
+  border-radius:50%;
+  width:22px;
+  height:22px;
+  font-size:12px;
+  line-height:1;
+  cursor:pointer;
+  z-index:2;
+}
+.extra-slot-row .remove-slot-btn:hover{color:var(--rose); border-color:var(--rose);}
 
 .thumb-strip .thumb-item{position:relative;}
 .thumb-cap{

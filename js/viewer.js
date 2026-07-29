@@ -34,6 +34,7 @@
     const isOn = stage.classList.toggle('is-3d');
     toggle3DBtn.textContent = isOn ? '2D View' : '3D View';
     zoomPan.reset(); // pan/zoom + tilt together gets disorienting, so start clean on toggle
+    clearFocusedPin();
   });
 
   /* ---------- Zoom / pan controller ---------- */
@@ -175,6 +176,36 @@
     return { reset };
   })();
 
+  /* ---------- Hover / tap-to-select before opening ----------
+     Mouse: hovering a pin previews it (scales it up, dims the rest) so a
+     single click on the already-hovered pin opens it. Touch has no hover,
+     so the same preview state is entered on the first tap; a second tap on
+     the SAME pin then opens it. Tapping a different pin just re-previews
+     it instead of opening — lets people re-aim before committing. */
+  let focusedPin = null;
+
+  function setFocusedPin(el){
+    if(focusedPin === el) return;
+    clearFocusedPin();
+    focusedPin = el;
+    el.classList.add('is-focused');
+    mapPlane.querySelectorAll('.pin').forEach(p=>{
+      if(p !== el) p.classList.add('is-dimmed');
+    });
+  }
+
+  function clearFocusedPin(){
+    if(!focusedPin) return;
+    focusedPin.classList.remove('is-focused');
+    mapPlane.querySelectorAll('.pin').forEach(p=> p.classList.remove('is-dimmed'));
+    focusedPin = null;
+  }
+
+  // Tapping/clicking empty map space (not a pin) clears the preview.
+  mapPlane.addEventListener('click', (e)=>{
+    if(!e.target.closest('.pin')) clearFocusedPin();
+  });
+
   function buildPins(){
     mapPlane.querySelectorAll('.pin').forEach(p=>p.remove());
     pins.forEach((pin, i)=>{
@@ -194,7 +225,25 @@
         <span class="label">${safeTitle}</span>
       `;
       applyPinVisuals(el, pin, viewSettings);
-      el.addEventListener('click', ()=> openPin(pin));
+
+      // Mouse: hovering previews it. (Touch devices don't fire hover, so
+      // this simply doesn't apply there — the click handler below covers
+      // the first-tap preview instead.)
+      el.addEventListener('pointerenter', (e)=>{
+        if(e.pointerType === 'mouse') setFocusedPin(el);
+      });
+      el.addEventListener('pointerleave', (e)=>{
+        if(e.pointerType === 'mouse' && focusedPin === el) clearFocusedPin();
+      });
+
+      el.addEventListener('click', ()=>{
+        if(focusedPin === el){
+          clearFocusedPin();
+          openPin(pin);
+        } else {
+          setFocusedPin(el);
+        }
+      });
       mapPlane.appendChild(el);
     });
     repositionPins();

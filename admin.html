@@ -152,25 +152,9 @@
         </div>
       </div>
       <div class="field">
-        <label>Extra images (optional, shown smaller in a strip below)</label>
-        <div class="image-slot-pair">
-          <div class="image-slot">
-            <label class="file-drop" id="dropLabelExtra1">
-              Extra image 1
-              <input type="file" id="fFileExtra1" accept="image/*" style="display:none;">
-              <div class="slot-preview" id="previewExtra1"></div>
-            </label>
-            <input type="text" id="fCaptionExtra1" class="caption-input" placeholder="Caption (optional)">
-          </div>
-          <div class="image-slot">
-            <label class="file-drop" id="dropLabelExtra2">
-              Extra image 2
-              <input type="file" id="fFileExtra2" accept="image/*" style="display:none;">
-              <div class="slot-preview" id="previewExtra2"></div>
-            </label>
-            <input type="text" id="fCaptionExtra2" class="caption-input" placeholder="Caption (optional)">
-          </div>
-        </div>
+        <label>Extra images (optional, shown smaller in a strip below — add as many as you like)</label>
+        <div class="extra-slots" id="extraSlotsContainer"></div>
+        <button type="button" class="btn" id="addExtraSlotBtn">+ Add extra image</button>
       </div>
       <div class="field" style="display:flex; gap:8px;">
         <button class="btn btn-gold" id="savePinBtn" style="flex:1;">Save pin</button>
