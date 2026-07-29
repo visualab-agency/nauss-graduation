@@ -3,6 +3,7 @@
   const mapImg = document.getElementById('mapImg');
   const mapPlane = document.getElementById('mapPlane');
   const toggle3DBtn = document.getElementById('toggle3DBtn');
+  const toggle3DLabel = toggle3DBtn.querySelector('.btn-3d-label');
   const zoomInBtn = document.getElementById('zoomInBtn');
   const zoomOutBtn = document.getElementById('zoomOutBtn');
   const zoomResetBtn = document.getElementById('zoomResetBtn');
@@ -32,7 +33,7 @@
 
   toggle3DBtn.addEventListener('click', ()=>{
     const isOn = stage.classList.toggle('is-3d');
-    toggle3DBtn.textContent = isOn ? '2D View' : '3D View';
+    toggle3DLabel.textContent = isOn ? '2D VIEW' : '3D MODE';
     zoomPan.reset(); // pan/zoom + tilt together gets disorienting, so start clean on toggle
     clearFocusedPin();
   });

@@ -215,6 +215,76 @@ body.page-viewer .stage img{
   .info-overlay p{ display:none; }
 }
 
+.btn-3d-mode{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  padding:9px 16px;
+  border-radius:999px;
+  border:1px solid var(--gold);
+  background:linear-gradient(135deg, rgba(201,162,78,0.18), rgba(201,162,78,0.06));
+  color:var(--gold-light);
+  font-family:'Inter', sans-serif;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .18s ease;
+}
+.btn-3d-mode:hover{
+  background:linear-gradient(135deg, var(--gold), #a97f34);
+  color:#181205;
+}
+.btn-3d-icon{
+  font-size:14px;
+  line-height:1;
+}
+
+.zoom-controls{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  z-index:7;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  background:rgba(11,14,18,0.72);
+  backdrop-filter:blur(14px);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:6px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+.zoom-controls button{
+  width:34px;height:34px;
+  border-radius:10px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--text);
+  font-size:16px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s ease;
+}
+.zoom-controls button:hover{background:var(--panel-2); border-color:var(--gold); color:var(--gold-light);}
+.zoom-controls button:disabled{opacity:0.35; cursor:not-allowed;}
+.zoom-controls button:disabled:hover{background:transparent; border-color:transparent; color:var(--text);}
+.zoom-controls #zoomResetBtn{font-size:14px;}
+.zoom-controls .zoom-level{
+  font-size:10.5px;
+  color:var(--text-dim);
+  padding:2px 0 4px;
+  text-align:center;
+}
+@media (max-width:760px){
+  .zoom-controls{ right:12px; bottom:12px; padding:4px; }
+  .zoom-controls button{ width:30px; height:30px; font-size:14px; }
+}
+
 .stage-wrap{
   padding:10px clamp(18px,4vw,48px) 14px;
   flex:1;
@@ -332,14 +402,16 @@ body.page-viewer .stage img{
   100%{transform:scale(2.1); opacity:0;}
 }
 
-/* Viewer pins: circular photo thumbnail instead of a plain gold dot, 50% bigger */
+/* Viewer pins: circular photo thumbnail instead of a plain gold dot, 50% bigger.
+   Scaled by --bubble-scale (set in common.js/getMapBubbleScale) so pins shrink
+   proportionally to the rendered map size instead of staying a fixed px size. */
 .pin.pin-photo{
-  width:47px;
-  height:47px;
+  width:calc(47px * var(--bubble-scale, 1));
+  height:calc(47px * var(--bubble-scale, 1));
 }
 .pin.pin-photo .glow{
-  width:44px;
-  height:44px;
+  width:calc(44px * var(--bubble-scale, 1));
+  height:calc(44px * var(--bubble-scale, 1));
 }
 .pin.pin-photo .thumb-dot{
   position:absolute;
@@ -401,12 +473,21 @@ body.page-viewer .stage img{
   position:relative;
   transform-style: preserve-3d;
   transition: transform 0.9s cubic-bezier(.4,.1,.2,1);
-  transform: rotateX(0deg) rotateZ(0deg);
+  transform:
+    translate(var(--pan-x,0px), var(--pan-y,0px))
+    scale(var(--zoom,1))
+    rotateX(0deg) rotateZ(0deg);
 }
+.map-plane.no-anim{ transition:none; }
 body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; justify-content:center; }
 .stage.is-3d .map-plane{
-  transform: rotateX(var(--tilt-x,55deg)) rotateZ(var(--tilt-z,12deg));
+  transform:
+    translate(var(--pan-x,0px), var(--pan-y,0px))
+    scale(var(--zoom,1))
+    rotateX(var(--tilt-x,55deg)) rotateZ(var(--tilt-z,12deg));
 }
+.stage.zoomable{ cursor:grab; }
+.stage.zoomable.is-panning{ cursor:grabbing; }
 
 /* Admin uses the same thumbnail standees as the client view while previewing the tilt. */
 
@@ -423,7 +504,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
 }
 .stage.is-3d .pin-stalk{
   opacity:.85;
-  height:var(--pin-lift,70px);
+  height:calc(var(--pin-lift,70px) * var(--standee-scale, 1));
 }
 
 /* Small caption that rides just under the standee card in 3D mode */
@@ -431,7 +512,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
   display:none;
   position:absolute;
   left:50%; top:50%;
-  font-size:10px;
+  font-size:calc(10px * var(--standee-scale, 1));
   letter-spacing:.05em;
   text-transform:uppercase;
   color:var(--gold-light);
@@ -446,7 +527,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
   transform-origin:center bottom;
   transform:
     translate(calc(-50% + var(--label-offset-x,0px)), -50%)
-    translateY(calc(-1 * var(--pin-label-lift,136px)))
+    translateY(calc(-1 * var(--pin-label-lift,136px) * var(--standee-scale, 1)))
     rotateZ(calc(-1 * var(--pin-tilt-z,12deg)))
     rotateX(calc(-1 * var(--pin-tilt-x,55deg)))
     skewX(var(--pin-skew,0deg))
@@ -456,7 +537,8 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
 /* The circular thumbnail becomes an elevated, upright rectangular standee in 3D mode.
    Pin tilt can be tuned separately from the map-plane's own tilt. */
 .stage.is-3d .pin.pin-photo .thumb-dot{
-  width:90px; height:60px;
+  width:calc(90px * var(--standee-scale, 1));
+  height:calc(60px * var(--standee-scale, 1));
   border-radius:6px;
   border-color:rgba(255,244,210,0.96);
   box-shadow:
@@ -468,7 +550,7 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
     0 0 0 2px rgba(11,14,18,0.78);
   transform:
     translate(-50%,-50%)
-    translateY(calc(-1 * var(--pin-lift,70px)))
+    translateY(calc(-1 * var(--pin-lift,70px) * var(--standee-scale, 1)))
     rotateZ(calc(-1 * var(--pin-tilt-z,12deg)))
     rotateX(calc(-1 * var(--pin-tilt-x,55deg)))
     skewX(var(--pin-skew,0deg))
@@ -1066,6 +1148,39 @@ body.page-viewer .map-plane{ height:100%; display:flex; align-items:center; just
 .extra-overlay .icon-btn{
   position:absolute;
   top:14px; right:14px;
+}
+
+/* Fullscreen image overlay — tapped from either the main pair or an extra image.
+   Must be position:fixed relative to the viewport, not the .viewer modal, so it
+   covers the whole screen regardless of where in the DOM/stacking context it's
+   triggered from. */
+.fullscreen-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(4,5,7,0.97);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:300;
+}
+.fullscreen-overlay.open{opacity:1; pointer-events:auto;}
+.fullscreen-overlay img{
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+  border-radius:6px;
+}
+.fullscreen-overlay .icon-btn{
+  position:fixed;
+  top:16px; right:16px;
+  background:rgba(11,14,18,0.7);
 }
 
 .badge{
