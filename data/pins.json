@@ -283,16 +283,37 @@
     "id": "pbv5qhvd",
     "x": 29.58,
     "y": 56.99,
-    "title": "Exhibition",
-    "category": "",
+    "title": "Exhibition Hall",
+    "category": "Exhibition Architecture & Fit-Out",
     "orientation": 1,
-    "description": "",
+    "description": "The 600-square-meter facility is a temporary building designed in a star-shaped layout inspired by the university logo, featuring themed exhibit wings branching out from a central reception hub with high-end porcelain flooring and architectural lighting.",
     "mainImages": [
       {
         "file": "pin-13-exhibition-main1.png",
-        "caption": ""
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-13-exhibition-hall-main2.png",
+        "caption": "Option 02"
       }
     ],
-    "extraImages": []
+    "extraImages": [
+      {
+        "file": "pin-13-exhibition-hall-extra1.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-13-exhibition-hall-extra2.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-13-exhibition-hall-extra3.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-13-exhibition-hall-extra4.png",
+        "caption": ""
+      }
+    ]
   }
 ]
