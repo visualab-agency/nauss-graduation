@@ -9,29 +9,29 @@
     "description": "Entrance Gate to the Tent",
     "mainImages": [
       {
-        "file": "pin-03-reception-tent-main1.png",
+        "file": "pin-01-reception-tent-main1.jpg",
         "caption": "Option 01"
       },
       {
-        "file": "pin-03-reception-tent-main2.png",
+        "file": "pin-01-reception-tent-main2.jpg",
         "caption": "Option 02"
       }
     ],
     "extraImages": [
       {
-        "file": "pin-01-reception-tent-extra1.png",
+        "file": "pin-01-reception-tent-extra1.jpg",
         "caption": ""
       },
       {
-        "file": "pin-01-reception-tent-extra2.jpg",
+        "file": "pin-01-reception-tent-extra2.png",
         "caption": ""
       },
       {
-        "file": "pin-01-reception-tent-extra3.jpg",
+        "file": "pin-01-reception-tent-extra3.png",
         "caption": ""
       },
       {
-        "file": "pin-01-reception-tent-extra4.jpg",
+        "file": "pin-01-reception-tent-extra4.png",
         "caption": ""
       }
     ]
