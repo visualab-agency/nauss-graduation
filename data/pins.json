@@ -360,19 +360,27 @@
     "extraImages": [
       {
         "file": "pin-13-exhibition-hall-extra1.png",
-        "caption": ""
+        "caption": "Option 1 Interior Shot 1"
       },
       {
         "file": "pin-13-exhibition-hall-extra2.png",
-        "caption": ""
+        "caption": "Option 1 Interior Shot 2"
       },
       {
         "file": "pin-13-exhibition-hall-extra3.png",
-        "caption": ""
+        "caption": "Option 1 Interior Shot 3"
       },
       {
         "file": "pin-13-exhibition-hall-extra4.png",
-        "caption": ""
+        "caption": "Option 2 Interior Shot 1"
+      },
+      {
+        "file": "pin-13-exhibition-hall-extra5.png",
+        "caption": "Option 2 Interior Shot 2"
+      },
+      {
+        "file": "pin-13-exhibition-hall-extra6.png",
+        "caption": "Option 2 Interior Shot 3"
       }
     ]
   },
