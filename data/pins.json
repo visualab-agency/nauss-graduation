@@ -148,7 +148,16 @@
         "caption": "Option 02"
       }
     ],
-    "extraImages": []
+    "extraImages": [
+      {
+        "file": "pin-05-student-journey-extra1.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-05-student-journey-extra2.jpg",
+        "caption": ""
+      }
+    ]
   },
   {
     "id": "p61diljz",
