@@ -62,6 +62,7 @@
     "y": 32.79,
     "title": "Parents Tunnel Journey",
     "category": "Parents Arrival",
+    "orientation": 1,
     "description": "Tunnel Arches for welcoming the parents",
     "mainImages": [
       {
@@ -70,7 +71,7 @@
       },
       {
         "file": "pin-03-parents-tunnel-journey-main2.jpg",
-        "caption": "Option 01"
+        "caption": "Option 02"
       }
     ],
     "extraImages": [
