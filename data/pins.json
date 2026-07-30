@@ -350,5 +350,34 @@
         "caption": ""
       }
     ]
+  },
+  {
+    "id": "psq9m568",
+    "x": 32.99,
+    "y": 45.02,
+    "title": "Tunnel Entrance",
+    "category": "Student Path",
+    "orientation": 1,
+    "description": "Tunnel At the end of first passage",
+    "mainImages": [
+      {
+        "file": "pin-14-tunnel-entrance-main1.png",
+        "caption": "Option 01"
+      },
+      {
+        "file": "pin-14-tunnel-entrance-main2.jpg",
+        "caption": "Option 02"
+      }
+    ],
+    "extraImages": [
+      {
+        "file": "pin-14-tunnel-entrance-extra1.png",
+        "caption": ""
+      },
+      {
+        "file": "pin-14-tunnel-entrance-extra2.png",
+        "caption": ""
+      }
+    ]
   }
 ]
