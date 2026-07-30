@@ -33,6 +33,14 @@
       {
         "file": "pin-01-reception-tent-extra4.png",
         "caption": ""
+      },
+      {
+        "file": "pin-01-reception-tent-extra5.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-01-reception-tent-extra6.jpg",
+        "caption": ""
       }
     ]
   },
@@ -396,25 +404,5 @@
         "caption": ""
       }
     ]
-  },
-  {
-    "id": "pwyjdaba",
-    "x": 24.61,
-    "y": 58.84,
-    "title": "Tower Sculpture",
-    "category": "Guest and Student crossing",
-    "orientation": 1,
-    "description": "Earth sphere and Branding under the tower",
-    "mainImages": [
-      {
-        "file": "pin-15-tower-sculpture-main1.jpg",
-        "caption": ""
-      },
-      {
-        "file": "pin-15-tower-sculpture-main2.jpg",
-        "caption": ""
-      }
-    ],
-    "extraImages": []
   }
 ]
