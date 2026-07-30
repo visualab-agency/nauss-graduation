@@ -95,15 +95,40 @@
     "description": "Graduation Ceremony stage design, with main led wall and side projection on auditorium side walls",
     "mainImages": [
       {
-        "file": "pin-04-graduation-ceremony-stage-design-main1.jpg",
+        "file": "pin-04-stage-design-main1.jpg",
         "caption": "Option 01"
       },
       {
-        "file": "pin-04-graduation-ceremony-stage-design-main2.jpg",
-        "caption": "Option 01"
+        "file": "pin-04-stage-design-main2.jpg",
+        "caption": "Option 02"
       }
     ],
-    "extraImages": []
+    "extraImages": [
+      {
+        "file": "pin-04-stage-design-extra1.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-04-stage-design-extra2.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-04-stage-design-extra3.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-04-stage-design-extra4.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-04-stage-design-extra5.jpg",
+        "caption": ""
+      },
+      {
+        "file": "pin-04-stage-design-extra6.jpg",
+        "caption": ""
+      }
+    ]
   },
   {
     "id": "pa9x95pt",
